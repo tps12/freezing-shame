@@ -1,5 +1,5 @@
 """
-Django settings for freezingshame project.
+Django settings for freezing project.
 
 For more information on this file, see
 https://docs.djangoproject.com/en/1.6/topics/settings/
@@ -34,6 +34,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'shame',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -45,9 +46,9 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'freezingshame.urls'
+ROOT_URLCONF = 'freezing.urls'
 
-WSGI_APPLICATION = 'freezingshame.wsgi.application'
+WSGI_APPLICATION = 'freezing.wsgi.application'
 
 
 # Database
