@@ -5,3 +5,11 @@ class Store(models.Model):
 
     def __str__(self):
         return self.subdomain
+
+class Product(models.Model):
+    name = models.CharField(max_length=64)
+    price = models.IntegerField()
+    store = models.ForeignKey(Store)
+
+    def __str__(self):
+        return self.name

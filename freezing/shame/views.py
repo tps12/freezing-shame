@@ -1,4 +1,11 @@
-from django.http import HttpResponse
+from django.shortcuts import render
+
+from shame.models import Product
 
 def index(request):
-    return HttpResponse('Hello {}'.format(request.store))
+    products = [
+        { 'name': product.name,
+          'price': '${:,.2f}'.format(product.price/100.0) }
+        for product in
+        Product.objects.filter(store=request.store)]
+    return render(request, 'products.html', { 'products': products })

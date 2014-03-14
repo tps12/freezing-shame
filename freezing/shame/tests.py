@@ -11,9 +11,22 @@ class IndexTest(TestCase):
     from django.test.client import Client
     Client = staticmethod(Client)
 
-    def test_hello(self):
-        response = self.Client().get('/', HTTP_HOST='example.biz')
-        self.assertIn(b'Hello', response.content)
+    from shame.models import Store
+    Store = staticmethod(Store)
+
+    from shame.models import Product
+    Product = staticmethod(Product)
+
+    def test_products(self):
+        store = self.Store(subdomain='the-store')
+        store.save()
+
+        product = self.Product(store=store, name='Thingy', price=123)
+        product.save()
+
+        response = self.Client().get('/', HTTP_HOST='the-store.example.biz')
+        self.assertIn(b'Thingy', response.content)
+        self.assertIn(b'$1.23', response.content)
 
 class SubdomainTest(TestCase):
     from shame.models import Store
