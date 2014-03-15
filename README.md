@@ -28,7 +28,7 @@ Added theodicy, hacking, bulkily, resthouse, thegndom, cedry, quaker, aftershock
 Run locally by adding each store's subdomain to `/etc/hosts`, e.g.:
 ```
 $ for subdomain in oxywelding systyle genesiacal;
-> do sudo echo "127.0.0.1\t$subdomain.localhost" > /etc/hosts;
+> do echo 127.0.0.1 $subdomain.localhost | sudo tee -a /etc/hosts;
 > done
 ```
 
