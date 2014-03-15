@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 from django.db import models
 
 class Store(models.Model):
@@ -7,6 +9,8 @@ class Store(models.Model):
         return self.subdomain
 
 class Product(models.Model):
+    newsku = lambda: str(uuid4())
+    sku = models.CharField(max_length=36, unique=True, default=newsku)
     name = models.CharField(max_length=64)
     price = models.IntegerField()
     store = models.ForeignKey(Store)

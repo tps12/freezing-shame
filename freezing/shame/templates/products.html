@@ -1,3 +1,7 @@
+<html>
+<body>
 {% for product in products %}
-    {{product.name}}: {{product.price}}
+    <a href="{% url 'shame.views.detail' product.sku %}">{{product.name}}</a>: {{product.price}}
 {% endfor %}
+</body>
+</html>
