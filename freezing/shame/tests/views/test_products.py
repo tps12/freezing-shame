@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-class IndexTest(TestCase):
+class ProductsTest(TestCase):
     from django.test.client import Client
     Client = staticmethod(Client)
 
@@ -37,15 +37,3 @@ class IndexTest(TestCase):
                 break
         else:
             self.fail()
-
-    def test_product(self):
-        store = self.Store(subdomain='the-store')
-        store.save()
-
-        product = self.Product(store=store, name='Thingy', price=123)
-        product.save()
-
-        response = self.Client().get(
-            '/' + product.sku, HTTP_HOST='the-store.example.biz')
-        self.assertIn(b'Thingy', response.content)
-        self.assertIn(b'$1.23', response.content)
