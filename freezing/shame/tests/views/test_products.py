@@ -24,6 +24,13 @@ class ProductsTest(TestCase):
         self.assertIn(b'Thingy', response.content)
         self.assertIn(b'$1.23', response.content)
 
+    def test_cantpost(self):
+        store = self.Store(subdomain='the-store')
+        store.save()
+
+        response = self.Client().post('/', HTTP_HOST='the-store.example.biz')
+        self.assertEqual(response.status_code, 405)
+
     def test_linktoproduct(self):
         store = self.Store(subdomain='the-store')
         store.save()
