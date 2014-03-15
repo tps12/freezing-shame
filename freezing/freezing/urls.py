@@ -12,5 +12,6 @@ urlpatterns = patterns('',
 
     url(r'^$', 'shame.views.index'),
     url(r'^(' + uuid + ')$', 'shame.views.detail'),
+    url(r'^cart$', 'shame.views.cart'),
     url(r'^admin/', include(admin.site.urls)),
 )

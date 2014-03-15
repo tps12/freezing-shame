@@ -10,6 +10,9 @@ class ProductTest(TestCase):
     from shame.models import Product
     Product = staticmethod(Product)
 
+    from xml.etree import ElementTree
+    ElementTree = staticmethod(ElementTree)
+
     def test_product(self):
         store = self.Store(subdomain='the-store')
         store.save()
@@ -32,3 +35,19 @@ class ProductTest(TestCase):
         response = self.Client().post(
             '/' + product.sku, HTTP_HOST='the-store.example.biz')
         self.assertEqual(response.status_code, 405)
+
+    def test_addbutton(self):
+        store = self.Store(subdomain='the-store')
+        store.save()
+
+        product = self.Product(store=store, name='Thingy', price=123)
+        product.save()
+
+        response = self.Client().get(
+            '/' + product.sku, HTTP_HOST='the-store.example.biz')
+        for form in self.ElementTree.fromstring(response.content).iter('form'):
+            if form.attrib['action'].endswith('/cart'):
+                self.assertEqual(form.attrib['method'], 'POST')
+                break
+        else:
+            self.fail()

@@ -1,0 +1,8 @@
+<html>
+<body>
+{% for item in cart.contents %}
+    <div>{{item.quantity}} &#xd7; {{item.name}} @ {{item.ea}}: {{item.total}}</div>
+{% endfor %}
+<div>{{cart.total}}</div>
+</body>
+</html>
