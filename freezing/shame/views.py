@@ -15,7 +15,15 @@ def index(request):
           'price': price(product.price) }
         for product in
         Product.objects.filter(store=request.store)]
-    return render(request, 'products.html', { 'products': products })
+    try:
+        cartsize = sum(
+            request.session['cart'][request.store.subdomain].values())
+    except KeyError:
+        cartsize = 0
+    return render(
+        request,
+        'products.html',
+        { 'products': products, 'cartsize': cartsize })
 
 @require_safe
 def detail(request, sku):
@@ -71,3 +79,22 @@ def cart(request):
                              for item in contents],
                 'total': price(sum([item['quantity'] * item['ea']
                                     for item in contents])) } })
+
+@require_http_methods(['GET','HEAD','POST'])
+def checkout(request):
+    if request.method == 'POST':
+        try:
+            carts = request.session['cart']
+        except KeyError:
+            carts = {}
+        try:
+            cart = carts[request.store.subdomain]
+            del carts[request.store.subdomain]
+        except KeyError:
+            cart = {}
+        if len(cart) == 0:
+            return HttpResponse('No items in cart', status=400)
+        request.session['cart'] = carts
+        return redirect('shame.views.index')
+    else:
+        return redirect('shame.views.cart')

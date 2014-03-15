@@ -44,3 +44,31 @@ class ProductsTest(TestCase):
                 break
         else:
             self.fail()
+
+    def test_emptycart(self):
+        store = self.Store(subdomain='the-store')
+        store.save()
+
+        response = self.Client().get('/', HTTP_HOST='the-store.example.biz')
+        self.assertNotIn(b'Checkout', response.content)
+
+    def test_linktocart(self):
+        store = self.Store(subdomain='the-store')
+        store.save()
+
+        product = self.Product(store=store, name='Thingy', price=123)
+        product.save()
+
+        client = self.Client()
+        client.post(
+            '/cart',
+            { 'sku': product.sku },
+            HTTP_HOST='the-store.example.biz')
+
+        response = client.get('/', HTTP_HOST='the-store.example.biz')
+        for a in self.ElementTree.fromstring(response.content).iter('a'):
+            if a.attrib['href'].endswith('/cart'):
+                self.assertIn('Checkout', a.text)
+                break
+        else:
+            self.fail()

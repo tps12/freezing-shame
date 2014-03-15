@@ -4,5 +4,11 @@
     <div>{{item.quantity}} &#xd7; {{item.name}} @ {{item.ea}}: {{item.total}}</div>
 {% endfor %}
 <div>{{cart.total}}</div>
+{% if cart.contents|length > 0 %}
+    <form action="{% url 'shame.views.checkout' %}" method="POST">
+    {% csrf_token %}
+    <input type="submit" value="Checkout" />
+    </form>
+{% endif %}
 </body>
 </html>

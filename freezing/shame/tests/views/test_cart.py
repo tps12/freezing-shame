@@ -10,6 +10,9 @@ class CartTest(TestCase):
     from shame.models import Product
     Product = staticmethod(Product)
 
+    from xml.etree import ElementTree
+    ElementTree = staticmethod(ElementTree)
+
     def test_addtocart(self):
         store = self.Store(subdomain='the-store')
         store.save()
@@ -153,3 +156,36 @@ class CartTest(TestCase):
             HTTP_HOST='another-store.example.biz')
         self.assertNotIn(b'$1.23', response.content)
         self.assertIn(b'$4.56', response.content)
+
+    def test_nocheckoutifempty(self):
+        store = self.Store(subdomain='the-store')
+        store.save()
+
+        product = self.Product(store=store, name='Thingy', price=123)
+        product.save()
+
+        response = self.Client().get('/cart', HTTP_HOST='the-store.example.biz')
+        for form in self.ElementTree.fromstring(response.content).iter('form'):
+            if form.attrib['action'].endswith('/checkout'):
+                self.fail()
+
+    def test_checkoutbutton(self):
+        store = self.Store(subdomain='the-store')
+        store.save()
+
+        product = self.Product(store=store, name='Thingy', price=123)
+        product.save()
+
+        client = self.Client()
+        client.post(
+            '/cart',
+            { 'sku': product.sku },
+            HTTP_HOST='the-store.example.biz')
+
+        response = client.get('/cart', HTTP_HOST='the-store.example.biz')
+        for form in self.ElementTree.fromstring(response.content).iter('form'):
+            if form.attrib['action'].endswith('/checkout'):
+                self.assertEqual(form.attrib['method'], 'POST')
+                break
+        else:
+            self.fail()

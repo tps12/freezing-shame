@@ -1,5 +1,8 @@
 <html>
 <body>
+{% if cartsize > 0 %}
+    <div><a href="{% url 'shame.views.cart' %}">Checkout {{cartsize}} items</a></div>
+{% endif %}
 {% for product in products %}
     <a href="{% url 'shame.views.detail' product.sku %}">{{product.name}}</a>: {{product.price}}
 {% endfor %}
