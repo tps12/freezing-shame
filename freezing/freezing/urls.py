@@ -15,6 +15,7 @@ urlpatterns = patterns('',
     url(r'^cart$', 'shame.views.cart'),
     url(r'^checkout$', 'shame.views.checkout'),
     url(r'^accounts/login/$', 'django.contrib.auth.views.login'),
+    url(r'^accounts/logout/$', 'shame.views.logoff'),
     url(r'^accounts/register/$', 'shame.views.register'),
     url(r'^admin/', include(admin.site.urls)),
 )

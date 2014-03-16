@@ -1,5 +1,13 @@
 <html>
 <body>
+{% if user.is_authenticated %}
+    <form action="{% url 'shame.views.logoff' %}" method="POST">
+        {% csrf_token %}
+        <label>Logged in as {{user.username}},</label>
+        <input type="submit" value="Logout" />
+    </form>
+{% endif %}
+
 {% block content %}
 {% endblock %}
 </body>

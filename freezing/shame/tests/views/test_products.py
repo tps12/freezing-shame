@@ -4,6 +4,9 @@ class ProductsTest(TestCase):
     from django.test.client import Client
     Client = staticmethod(Client)
 
+    from django.contrib.auth.models import User
+    User = staticmethod(User)
+
     from shame.models import Store
     Store = staticmethod(Store)
 
@@ -72,3 +75,36 @@ class ProductsTest(TestCase):
                 break
         else:
             self.fail()
+
+    def test_loggedin(self):
+        store = self.Store(subdomain='the-store')
+        store.save()
+
+        product = self.Product(store=store, name='Thingy', price=123)
+        product.save()
+
+        client = self.Client()
+        user = self.User.objects.create_user('test', password='secret')
+        client.login(username=user.username, password='secret')
+
+        response = client.get('/', HTTP_HOST='the-store.example.biz')
+        for form in self.ElementTree.fromstring(response.content).iter('form'):
+            if form.attrib['action'].endswith('/accounts/logout/'):
+                self.assertEqual(form.attrib['method'], 'POST')
+                break
+        else:
+            self.fail()
+
+    def test_loggedout(self):
+        store = self.Store(subdomain='the-store')
+        store.save()
+
+        product = self.Product(store=store, name='Thingy', price=123)
+        product.save()
+
+        self.User.objects.create_user('test', password='secret')
+
+        response = self.Client().get('/', HTTP_HOST='the-store.example.biz')
+        for form in self.ElementTree.fromstring(response.content).iter('form'):
+            if form.attrib['action'].endswith('/logout'):
+                self.fail()

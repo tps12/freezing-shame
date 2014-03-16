@@ -4,9 +4,9 @@ from django.core.urlresolvers import reverse
 from django.db.utils import IntegrityError
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
-from django.views.decorators.http import require_http_methods, require_safe
+from django.views.decorators.http import require_http_methods, require_POST, require_safe
 
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 
@@ -107,6 +107,11 @@ def checkout(request):
         return redirect('shame.views.index')
     else:
         return redirect('shame.views.cart')
+
+@require_POST
+def logoff(request):
+    logout(request)
+    return redirect('shame.views.index')
 
 @require_http_methods(['GET','HEAD','POST'])
 def register(request):
