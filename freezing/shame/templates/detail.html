@@ -1,10 +1,10 @@
-<html>
-<body>
+{% extends 'base.html' %}
+
+{% block content %}
 <form action="{% url 'shame.views.cart' %}" method="POST">
 {% csrf_token %}
 <input type="hidden" name="sku" value="{{product.sku}}" />
 {{product.name}}: {{product.price}}
 <input type="submit" value="Add to Cart" />
 </form>
-</body>
-</html>
+{% endblock %}

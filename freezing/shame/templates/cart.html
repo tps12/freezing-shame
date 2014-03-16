@@ -1,5 +1,6 @@
-<html>
-<body>
+{% extends 'base.html' %}
+
+{% block content %}
 {% for item in cart.contents %}
     <div>{{item.quantity}} &#xd7; {{item.name}} @ {{item.ea}}: {{item.total}}</div>
 {% endfor %}
@@ -10,5 +11,4 @@
     <input type="submit" value="Checkout" />
     </form>
 {% endif %}
-</body>
-</html>
+{% endblock %}
