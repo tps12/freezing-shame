@@ -10,7 +10,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 
-from shame.models import Product
+from shame.models import LineItem, Order, Product
 
 def price(price):
     return '${:,.2f}'.format(price/100.0)
@@ -103,6 +103,12 @@ def checkout(request):
             cart = {}
         if len(cart) == 0:
             return HttpResponse('No items in cart', status=400)
+        order = Order.objects.create(store=request.store, user=request.user)
+        prices = { product.sku: product.price for product in
+                   Product.objects.filter(sku__in=cart.keys()) }
+        for sku, quantity in cart.items():
+            for _ in range(quantity):
+                LineItem.objects.create(order=order, sku=sku, price=prices[sku])
         request.session['cart'] = carts
         return redirect('shame.views.index')
     else:
