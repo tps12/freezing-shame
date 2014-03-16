@@ -268,6 +268,23 @@ class AdminTest(TestCase):
                 links.append(a.attrib['href'])
         self.assertEqual(len(links), 3)
 
-    def test_searchorder(self): pass
+    def test_searchorder(self):
+        store = self.Store.objects.create(subdomain='the-store')
 
-    def test_searchuser(self): pass
+        customer = self.User.objects.create_user('customer')
+
+        order = self.Order.objects.create(store=store, user=customer)
+
+        user = self.User.objects.create_superuser(
+            'test', 'root@localhost', 'secret')
+
+        client = self.Client()
+        client.login(username=user.username, password='secret')
+
+        response = client.get('/admin/shame/order/', HTTP_HOST='example.biz')
+        content = self.cleanentities(response.content)
+        for input in self.ElementTree.fromstring(content).iter('input'):
+            if input.attrib['value'] == 'Search':
+                break
+        else:
+            self.fail()

@@ -41,5 +41,13 @@ class StoreItemAdmin(StoreSpecificAdmin):
     def _getstore(self, obj): return obj.store
     def _query(self, request):
         return { 'store': request.user.storeowner.store }
-admin.site.register(Order, StoreItemAdmin)
+
+class OrderAdmin(StoreItemAdmin):
+    class LineItemInline(admin.TabularInline):
+        model = LineItem
+    inlines = [ LineItemInline ]
+    search_fields = [
+        'user__username', 'user__email', 'created', 'lineitem__sku']
+admin.site.register(Order, OrderAdmin)
+
 admin.site.register(Product, StoreItemAdmin)
