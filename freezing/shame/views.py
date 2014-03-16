@@ -1,6 +1,14 @@
+from urllib.parse import urlencode
+
+from django.core.urlresolvers import reverse
+from django.db.utils import IntegrityError
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_http_methods, require_safe
+
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 
 from shame.models import Product
 
@@ -80,6 +88,7 @@ def cart(request):
                 'total': price(sum([item['quantity'] * item['ea']
                                     for item in contents])) } })
 
+@login_required
 @require_http_methods(['GET','HEAD','POST'])
 def checkout(request):
     if request.method == 'POST':
@@ -98,3 +107,31 @@ def checkout(request):
         return redirect('shame.views.index')
     else:
         return redirect('shame.views.cart')
+
+@require_http_methods(['GET','HEAD','POST'])
+def register(request):
+    if request.method == 'POST':
+        username, password = request.POST['username'], request.POST['password']
+        try:
+            if len(password) == 0:
+                raise ValueError('Must provide password')
+            User.objects.create_user(username, password=password)
+        except ValueError as e:
+            return HttpResponse(e, status=400)
+        except IntegrityError:
+            return redirect('?'.join((
+                reverse('django.contrib.auth.views.login'),
+                urlencode({
+                    'username': username,
+                    'next': request.POST['next'] }))))
+        login(request, authenticate(username=username, password=password))
+        return redirect(request.POST['next'])
+    else:
+        try:
+            next = request.GET['next']
+        except KeyError:
+            next = None
+        return render(
+            request,
+            'registration/register.html',
+            { 'next': next } if next else {})

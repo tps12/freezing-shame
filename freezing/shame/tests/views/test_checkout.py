@@ -4,14 +4,31 @@ class CheckoutTest(TestCase):
     from django.test.client import Client
     Client = staticmethod(Client)
 
+    from django.contrib.auth.models import User
+    User = staticmethod(User)
+
     from shame.models import Store
     Store = staticmethod(Store)
 
     from shame.models import Product
     Product = staticmethod(Product)
 
-    from xml.etree import ElementTree
-    ElementTree = staticmethod(ElementTree)
+    def test_requireslogin(self):
+        store = self.Store(subdomain='the-store')
+        store.save()
+
+        product = self.Product(store=store, name='Thingy', price=123)
+        product.save()
+
+        client = self.Client()
+        client.post(
+            '/cart',
+            { 'sku': product.sku },
+            HTTP_HOST='the-store.example.biz')
+
+        response = client.post('/checkout', HTTP_HOST='the-store.example.biz')
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/accounts/login', response['location'])
 
     def test_emptiescart(self):
         store = self.Store(subdomain='the-store')
@@ -21,6 +38,8 @@ class CheckoutTest(TestCase):
         product.save()
 
         client = self.Client()
+        user = self.User.objects.create_user('test', password='secret')
+        client.login(username=user.username, password='secret')
         client.post(
             '/cart',
             { 'sku': product.sku },
@@ -48,6 +67,8 @@ class CheckoutTest(TestCase):
         b.save()
 
         client = self.Client()
+        user = self.User.objects.create_user('test', password='secret')
+        client.login(username=user.username, password='secret')
 
         for store, product in (store1, a), (store1, a), (store2, b):
             client.post(
@@ -82,6 +103,8 @@ class CheckoutTest(TestCase):
         product.save()
 
         client = self.Client()
+        user = self.User.objects.create_user('test', password='secret')
+        client.login(username=user.username, password='secret')
         client.post(
             '/cart',
             { 'sku': product.sku },
@@ -99,7 +122,10 @@ class CheckoutTest(TestCase):
         product = self.Product(store=store, name='Thingy', price=123)
         product.save()
 
-        response = self.Client().post(
+        client = self.Client()
+        user = self.User.objects.create_user('test', password='secret')
+        client.login(username=user.username, password='secret')
+        response = client.post(
             '/checkout', HTTP_HOST='the-store.example.biz')
         self.assertEqual(response.status_code, 400)
 
@@ -110,7 +136,10 @@ class CheckoutTest(TestCase):
         product = self.Product(store=store, name='Thingy', price=123)
         product.save()
 
-        response = self.Client().get(
+        client = self.Client()
+        user = self.User.objects.create_user('test', password='secret')
+        client.login(username=user.username, password='secret')
+        response = client.get(
             '/checkout', HTTP_HOST='the-store.example.biz')
         self.assertEqual(response.status_code, 302)
         self.assertRegex(response['location'], r'/cart$')
