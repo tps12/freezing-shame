@@ -10,10 +10,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 
-from shame.models import LineItem, Order, Product
-
-def price(price):
-    return '${:,.2f}'.format(price/100.0)
+from shame.models import price, LineItem, Order, Product
 
 @require_safe
 def index(request):
