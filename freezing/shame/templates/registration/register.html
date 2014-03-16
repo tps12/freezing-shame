@@ -7,7 +7,7 @@
 {% csrf_token %}
 <div>
     <label for="id_username">Username:</label> <input id="id_username" maxlength="254" name="username" />
-    <label for="id_password">Username:</label> <input id="id_password" maxlength="254" name="password" type="password" />
+    <label for="id_password">Password:</label> <input id="id_password" maxlength="254" name="password" type="password" />
 </div>
 <div>
     {{form.password.label_tag}} {{form.password}}
