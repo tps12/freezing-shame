@@ -1,5 +1,6 @@
 from uuid import uuid4
 
+from django.core.validators import RegexValidator
 from django.db import models
 
 from django.contrib.auth.models import User, UserManager
@@ -8,7 +9,11 @@ def price(price):
     return '${:,.2f}'.format(price/100.0)
 
 class Store(models.Model):
-    subdomain = models.CharField(max_length=63)
+    subdomain = models.CharField(
+        max_length=63,
+        validators=[
+            # allow letters and numbers, and hyphens but only in the middle
+            RegexValidator(regex=r'^(?i)[a-z0-9]([-a-z0-9]*[a-z0-9])?$')])
 
     def __str__(self):
         return self.subdomain

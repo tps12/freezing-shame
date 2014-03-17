@@ -16,12 +16,14 @@ while True:
         break
 
 store = Store(subdomain=subdomain)
+store.full_clean()
 store.save()
 
 print('Created {} store'.format(store))
 
 for _ in range(randint(3, 10)):
     product = Product(store=store, name=choice(words), price=randint(99,1000))
+    product.full_clean()
     product.save()
 
 products = [str(product)
