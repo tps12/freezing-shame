@@ -1,6 +1,7 @@
 from django.contrib import admin
 
-from shame.models import LineItem, Order, Product, Store, StoreOwner
+from shame.models import (LineItem, Order, Product, Store, StoreOwner,
+    StoreTemplate)
 
 admin.site.register(StoreOwner)
 
@@ -51,3 +52,5 @@ class OrderAdmin(StoreItemAdmin):
 admin.site.register(Order, OrderAdmin)
 
 admin.site.register(Product, StoreItemAdmin)
+
+admin.site.register(StoreTemplate, StoreItemAdmin)

@@ -4,6 +4,7 @@ from django.core.urlresolvers import reverse
 from django.db.utils import IntegrityError
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
+from django.template import loader
 from django.views.decorators.http import require_http_methods, require_POST, require_safe
 
 from django.contrib.auth import authenticate, login, logout
@@ -11,6 +12,11 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 
 from shame.models import price, LineItem, Order, Product
+
+def renderwithstoretemplate(request, *args, **kwargs):
+    if len(args) > 0:
+        args = (('{};{}'.format(request.store, args[0]), args[0]),) + args[1:]
+    return render(request, *args, **kwargs)
 
 @require_safe
 def index(request):
@@ -25,7 +31,7 @@ def index(request):
             request.session['cart'][request.store.subdomain].values())
     except KeyError:
         cartsize = 0
-    return render(
+    return renderwithstoretemplate(
         request,
         'products.html',
         { 'products': products, 'cartsize': cartsize })
@@ -33,7 +39,7 @@ def index(request):
 @require_safe
 def detail(request, sku):
     product = Product.objects.get(sku=sku)
-    return render(
+    return renderwithstoretemplate(
         request,
         'detail.html',
         { 'product': {
@@ -73,7 +79,7 @@ def cart(request):
                       'ea': products[sku].price,
                       'quantity': quantity }
                     for (sku, quantity) in basket]
-        return render(
+        return renderwithstoretemplate(
             request,
             'cart.html',
             { 'cart': {
@@ -139,7 +145,7 @@ def register(request):
             next = request.GET['next']
         except KeyError:
             next = None
-        return render(
+        return renderwithstoretemplate(
             request,
             'registration/register.html',
             { 'next': next } if next else {})

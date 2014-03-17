@@ -13,6 +13,17 @@ class Store(models.Model):
     def __str__(self):
         return self.subdomain
 
+class StoreTemplate(models.Model):
+    store = models.ForeignKey(Store)
+    name = models.CharField(max_length=255)
+    content = models.TextField()
+
+    class Meta:
+        unique_together = ('store', 'name')
+
+    def __str__(self):
+        return '{} {} template'.format(self.store, self.name)
+
 class StoreOwnerManager(UserManager):
     def create_admin(
             self, username, store, email=None, password=None, **extra_fields):
