@@ -1,3 +1,5 @@
+from os import path, walk
+from re import match
 from uuid import uuid4
 
 from django.core.validators import RegexValidator
@@ -18,9 +20,17 @@ class Store(models.Model):
     def __str__(self):
         return self.subdomain
 
+templatedir = path.join('freezing', 'shame', 'templates', '')
 class StoreTemplate(models.Model):
+    templates = [
+        path.join(dir, filename).replace(templatedir, '')
+        for dir, _, filenames in walk(templatedir)
+        for filename in filenames if match(r'^[^_].*\.html$', filename)]
+
     store = models.ForeignKey(Store)
-    name = models.CharField(max_length=255)
+    name = models.CharField(
+        max_length=255,
+        choices=[(t,t) for t in templates])
     content = models.TextField()
 
     class Meta:
